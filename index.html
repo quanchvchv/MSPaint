@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        background-image: url("https://images.unsplash.com/photo-1465101162946-4377e57745c3?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80");
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+      .container {
+        width: 1000px;
+        background-color: white;
+        height: 700px;
+        margin: auto;
+        margin-top: 50px;
+      }
+      .color_btn {
+        width: 25px;
+        height: 25px;
+      }
+      .color_btn_1 {
+        background-color: red;
+      }
+      .color_btn_2 {
+        background-color: yellow;
+      }
+      .color_btn_3 {
+        background-color: blue;
+      }
+      .color_btn_4 {
+        background-color: purple;
+      }
+      .color_btn_5 {
+        background-color: green;
+      }
+      .color_btn_6 {
+        background-color: white;
+      }
+
+      .tool {
+        padding-top: 40px;
+        display: grid;
+        grid-template-columns: 2fr 0.5fr 2fr;
+        width: 100%;
+      }
+      .tool_btn {
+        margin-left: 230px;
+        width: 100%;
+      }
+      .size_btn {
+        width: 25px;
+        height: 25px;
+      }
+      .tool_color {
+        margin-left: 40px;
+      }
+      .tool_control {
+        width: 100%;
+        margin: auto;
+        text-align: center;
+      }
+      .control_btn {
+        width: 100px;
+        height: 25px;
+      }
+      .btn1 {
+        width: 6px;
+        height: 25px;
+        background-color: black;
+        position: relative;
+        top: -2px;
+        left: 1px;
+        transform: rotate(45deg);
+      }
+      .btn2 {
+        width: 5px;
+        height: 25px;
+        background-color: black;
+        position: relative;
+        top: -2px;
+        left: 1px;
+        transform: rotate(45deg);
+      }
+      .btn3 {
+        width: 4px;
+        height: 25px;
+        background-color: black;
+        position: relative;
+        top: -2px;
+        left: 1px;
+        transform: rotate(45deg);
+      }
+      .btn4 {
+        width: 3px;
+        height: 25px;
+        background-color: black;
+        position: relative;
+        top: -2px;
+        left: 1px;
+        transform: rotate(45deg);
+      }
+      .btn5 {
+        width: 2px;
+        height: 25px;
+        background-color: black;
+        position: relative;
+        top: -2px;
+        left: 1px;
+        transform: rotate(45deg);
+      }
+      .btn6 {
+        width: 1px;
+        height: 25px;
+        background-color: black;
+        position: relative;
+        top: -2px;
+        left: 3px;
+        transform: rotate(45deg);
+      }
+      img {
+        width: 20px;
+      }
+      .control_btn {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+      }
+      .paint {
+        text-align: center;
+        margin-top: 50px;
+      }
+      #canvas {
+        cursor: crosshair;
+      }
+      .active {
+        border: 5px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="tool">
+        <div class="tool_color">
+          <button class="color_btn color_btn_1" color="red"></button>
+          <button class="color_btn color_btn_2" color="yellow"></button>
+          <button class="color_btn color_btn_3" color="blue"></button>
+          <button class="color_btn color_btn_4" color="purple"></button>
+          <button class="color_btn color_btn_5" color="green"></button>
+          <button class="color_btn color_btn_6 active" color="white"></button>
+        </div>
+        <div class="tool_control">
+          <button class="control_btn">
+            <div style="text-align: right">
+              <img
+                src="https://cdn0.iconfinder.com/data/icons/basic-uses-symbol-vol-3/100/Refresh_Reset_Reload_Again_Restart-512.png"
+                alt=""
+              />
+            </div>
+            <div
+              style="
+                font-size: 18px;
+                text-align: left;
+                line-height: 21px;
+                margin-left: 7px;
+              "
+            >
+              Reset
+            </div>
+          </button>
+        </div>
+        <div class="tool_btn">
+          <button class="size_btn size_btn_1"><div class="btn1"></div></button>
+          <button class="size_btn size_btn_2"><div class="btn2"></div></button>
+          <button class="size_btn size_btn_3"><div class="btn3"></div></button>
+          <button class="size_btn size_btn_4"><div class="btn4"></div></button>
+          <button class="size_btn size_btn_5"><div class="btn5"></div></button>
+          <button class="size_btn size_btn_6"><div class="btn6"></div></button>
+        </div>
+      </div>
+      <div class="paint">
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    class FreeHand {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
+        this.isDraw = false;
+        this.points = [];
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
+        // lineJoin điểm đầu gấp khúc sẽ tròn
+        this.ctx.strokeStyle = "white";
+        //memory canvas
+        this.memCanvas = document.createElement("canvas");
+        this.memCtx = this.memCanvas.getContext("2d");
+        this.memCanvas.width = canvas.width;
+        this.memCanvas.height = canvas.height;
+      }
+      onMouseDown(e) {
+        this.x = e.offsetX;
+        this.y = e.offsetY;
+        this.points.push({
+          x: this.x,
+          y: this.y,
+        });
+        this.isDraw = true;
+      }
+      onMouseUp(e) {
+        this.isDraw = false;
+        this.memCtx.clearRect(
+          0,
+          0,
+          this.memCanvas.width,
+          this.memCanvas.height
+        );
+        this.memCtx.drawImage(this.canvas, 0, 0);
+        this.points = [];
+      }
+      onMouseMove(e) {
+        if (this.isDraw) {
+          // trường hợp đã có đường
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          this.ctx.drawImage(this.memCanvas, 0, 0);
+          // trường hợp vẽ đầu đầu
+          this.points.push({
+            x: e.offsetX,
+            y: e.offsetY,
+          });
+          this.drawPoints();
+        }
+      }
+      drawPoints() {
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.points[0].x, this.points[0].y);
+        for (let i = 1; i < this.points.length - 1; i++) {
+          let c = (this.points[i].x + this.points[i + 1].x) / 2;
+          let d = (this.points[i].y + this.points[i + 1].y) / 2;
+          this.ctx.quadraticCurveTo(this.points[i].x, this.points[i].y, c, d);
+          // c,d là điểm để nối x,y chỉ là trung gian
+        }
+        this.ctx.stroke();
+      }
+      clearCanvas() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.memCtx.clearRect(
+          0,
+          0,
+          this.memCanvas.width,
+          this.memCanvas.height
+        );
+      }
+    }
+
+    const canvas = document.getElementById("canvas");
+    canvas.width = 900;
+    canvas.height = 550;
+    canvas.style.backgroundColor = "black";
+    let freehand = new FreeHand(canvas);
+    canvas.addEventListener("mousedown", function (e) {
+      freehand.onMouseDown(e);
+    });
+    canvas.addEventListener("mousemove", function (e) {
+      freehand.onMouseMove(e);
+    });
+    canvas.addEventListener("mouseup", function (e) {
+      freehand.onMouseUp(e);
+    });
+
+    const btnColors = document.querySelectorAll(".color_btn");
+    btnColors.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        Array.from(btnColors).map((ele) => ele.classList.remove("active"));
+        btn.classList.add("active");
+        let color = btn.getAttribute("color");
+        freehand.ctx.strokeStyle = color;
+      });
+    });
+  </script>
+</html>
